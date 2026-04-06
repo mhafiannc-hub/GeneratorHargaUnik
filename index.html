@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Harga Pajak 10%</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+        }
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div class="max-w-2xl w-full card p-8 border border-slate-100">
+        <header class="mb-8 text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-800">Unique Price Fixer</h1>
+            <p class="text-slate-500 text-sm mt-1">Ubah hargamu agar lebih mudah roundingnya</p>
+        </header>
+
+        <div class="space-y-6">
+            <!-- Input Harga Dasar -->
+            <div class="max-w-md mx-auto">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Harga Dasar Saat Ini (Modal/DPP)</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">Rp</span>
+                    <input 
+                        type="number" 
+                        id="inputBasePrice" 
+                        placeholder="Contoh: 11818" 
+                        class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-lg font-medium"
+                    >
+                </div>
+                <p class="text-[11px] text-slate-400 mt-2 leading-relaxed text-center">
+                    Sistem akan menghitung Harga Dasar Unik untuk target total akhiran <b>999</b> dan <b>001</b>.
+                </p>
+                <button 
+                    onclick="generatePrices()"
+                    class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-indigo-100"
+                >
+                    Generate 2 Opsi Harga
+                </button>
+            </div>
+
+            <!-- Area Hasil Grid -->
+            <div id="resultArea" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                
+                <!-- OPSI A: ROUNDING ATAS (999) -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold text-indigo-500 uppercase tracking-widest text-center">Opsi Rounding Atas</h3>
+                    <div class="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 relative group">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-indigo-600 text-[10px] font-bold uppercase">Harga Dasar Baru</span>
+                            <button onclick="copyPrice('baseUp')" class="text-indigo-400 hover:text-indigo-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="displayBaseUp" class="text-xl font-bold text-indigo-900 tracking-tight">Rp 0</div>
+                        <div class="mt-3 pt-3 border-t border-indigo-100 grid grid-cols-2 gap-2 text-[10px]">
+                            <div>
+                                <span class="text-slate-400 block">Pajak (10%)</span>
+                                <span id="displayTaxUp" class="font-bold text-slate-600">Rp 0</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-indigo-400 block font-bold">TOTAL AKHIR</span>
+                                <span id="displayTotalUp" class="font-bold text-indigo-700 text-sm">Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OPSI B: ROUNDING BAWAH (001) -->
+                <div class="space-y-4">
+                    <h3 class="text-xs font-bold text-amber-500 uppercase tracking-widest text-center">Opsi Rounding Bawah</h3>
+                    <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 relative group">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-amber-600 text-[10px] font-bold uppercase">Harga Dasar Baru</span>
+                            <button onclick="copyPrice('baseDown')" class="text-amber-400 hover:text-amber-600 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="displayBaseDown" class="text-xl font-bold text-amber-900 tracking-tight">Rp 0</div>
+                        <div class="mt-3 pt-3 border-t border-amber-100 grid grid-cols-2 gap-2 text-[10px]">
+                            <div>
+                                <span class="text-slate-400 block">Pajak (10%)</span>
+                                <span id="displayTaxDown" class="font-bold text-slate-600">Rp 0</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-amber-500 block font-bold">TOTAL AKHIR</span>
+                                <span id="displayTotalDown" class="font-bold text-amber-700 text-sm">Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div id="copyToast" class="hidden text-center text-[10px] font-bold text-emerald-600 bg-emerald-100 py-2 rounded-xl animate-pulse">
+                ANGKA HARGA DASAR BERHASIL DISALIN!
+            </div>
+        </div>
+
+        <footer class="mt-8 pt-6 border-t border-slate-100 text-center">
+            <p class="text-slate-400 text-[10px]">© 2026 hafiannc - Dirancang khusus untuk teman-teman sekalian</p>
+        </footer>
+    </div>
+
+    <script>
+        let priceData = {
+            baseUp: 0,
+            baseDown: 0
+        };
+
+        function formatRupiah(number, showDecimals = false) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: showDecimals ? 2 : 0,
+                maximumFractionDigits: 2
+            }).format(number);
+        }
+
+        function generatePrices() {
+            const input = document.getElementById('inputBasePrice').value;
+            if (!input || input <= 0) return;
+
+            const baseInput = parseFloat(input);
+            const estimatedTotal = baseInput * 1.1;
+            const thousandBase = Math.floor(estimatedTotal / 1000) * 1000;
+
+            // OPSI ATAS: Target 999
+            let targetUp = thousandBase + 999;
+            // Jika estimasi sudah lewat dari targetUp, ambil ribuan berikutnya
+            if (estimatedTotal > targetUp) targetUp += 1000;
+            
+            priceData.baseUp = targetUp / 1.1;
+            const taxUp = targetUp - priceData.baseUp;
+
+            // OPSI BAWAH: Target 001
+            let targetDown = thousandBase + 1;
+            // Jika estimasi masih jauh di atas targetDown, pastikan tetap di ribuan yang sama atau bawahnya
+            if (estimatedTotal < targetDown) targetDown -= 1000;
+
+            priceData.baseDown = targetDown / 1.1;
+            const taxDown = targetDown - priceData.baseDown;
+
+            // Update UI Opsi Atas
+            document.getElementById('displayBaseUp').innerText = formatRupiah(priceData.baseUp, true);
+            document.getElementById('displayTaxUp').innerText = formatRupiah(taxUp, true);
+            document.getElementById('displayTotalUp').innerText = formatRupiah(targetUp);
+
+            // Update UI Opsi Bawah
+            document.getElementById('displayBaseDown').innerText = formatRupiah(priceData.baseDown, true);
+            document.getElementById('displayTaxDown').innerText = formatRupiah(taxDown, true);
+            document.getElementById('displayTotalDown').innerText = formatRupiah(targetDown);
+            
+            document.getElementById('resultArea').classList.remove('hidden');
+        }
+
+        function copyPrice(key) {
+            const val = priceData[key];
+            if (val === 0) return;
+            
+            const textToCopy = val.toFixed(2);
+            const el = document.createElement('textarea');
+            el.value = textToCopy;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const toast = document.getElementById('copyToast');
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2000);
+        }
+
+        document.getElementById('inputBasePrice').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') generatePrices();
+        });
+    </script>
+</body>
+</html>
